@@ -59,7 +59,7 @@ contract Game is ERC721 {
         return characterTypes;
     }
 
-    function mintPlayer(string memory name, uint256 characterType) external returns (uint256 tokenId) {
+    function mintPlayer(uint256 characterType) external returns (uint256 tokenId) {
         uint256 newTokenId = _tokenIds.current();
 
         _safeMint(msg.sender, newTokenId);
@@ -67,7 +67,6 @@ contract Game is ERC721 {
         console.log("Minted Player NFT w/ tokenId %s", newTokenId);
 
         characters[newTokenId] = characterTypes[characterType];
-        characters[newTokenId].name = name;
         charactersOwnedBy[msg.sender] = newTokenId;
 
         _tokenIds.increment();

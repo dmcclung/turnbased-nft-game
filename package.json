@@ -8,7 +8,8 @@
   "scripts": {
     "deploy:rinkeby": "hardhat run scripts/deploy.js --network rinkeby",
     "deploy": "hardhat run scripts/deploy.js",
-    "compile": "hardhat compile"
+    "compile": "hardhat compile",
+    "clean": "hardhat clean"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.3",

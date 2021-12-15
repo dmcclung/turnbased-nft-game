@@ -20,19 +20,19 @@ async function main() {
 
   console.log("Game deployed to:", game.address);
 
-  const tx = await game.mintPlayer("Player #1", 3);
-  await tx.wait();
+  // const tx = await game.mintPlayer("Player #1", 3);
+  // await tx.wait();
 
-  console.log("Minted player", tx.hash);
+  // console.log("Minted player", tx.hash);
 
-  const tokenURI = await game.tokenURI(0);
+  /* const tokenURI = await game.tokenURI(0);
   console.log("Token URI", tokenURI);
 
   const tx2 = await game.attackBoss();
   await tx2.wait();
 
   const tx3 = await game.attackBoss();
-  await tx3.wait();
+  await tx3.wait(); */
 }
 
 main().catch((error) => {
