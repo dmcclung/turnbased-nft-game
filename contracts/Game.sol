@@ -161,7 +161,7 @@ contract Game is ERC721 {
     uint256 private nonce = 0;
 
     function random() internal returns (uint) {
-        uint randomnumber = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce))) % 5;
+        uint randomnumber = uint(keccak256(abi.encodePacked(block.number, msg.sender, nonce))) % 5;
         nonce++;
         return randomnumber;
     }
