@@ -14,6 +14,7 @@ contract Game is ERC721 {
         uint256 hp;
         uint256 xp;
         uint256 gold;
+        uint256 maxHp;
         string name;
         string image;
     }
@@ -27,14 +28,16 @@ contract Game is ERC721 {
 
     event CharacterNFTMinted(address sender, uint256 tokenId, uint256 characterIndex);
     event AttackComplete(uint newBossHp, uint newPlayerHp);
+    event PlayerContinued(uint256 tokenId);
 
     constructor(uint256[] memory hp, 
                 uint256[] memory xp, 
                 uint256[] memory gold, 
+                uint256[] memory maxHp,
                 string[] memory name, 
                 string[] memory image) ERC721("Boss Encounters", "BOSS") {
         for (uint256 i = 0; i < hp.length - 1; i++) {
-            characterTypes.push(Character(hp[i], xp[i], gold[i], name[i], image[i]));
+            characterTypes.push(Character(hp[i], xp[i], gold[i], maxHp[i], name[i], image[i]));
             
             console.log("Created character %s with hp %s and image %s", 
                 name[i], hp[i], image[i]);
@@ -42,7 +45,7 @@ contract Game is ERC721 {
 
         uint bossIndex = hp.length - 1;
 
-        boss = Character(hp[bossIndex], xp[bossIndex], gold[bossIndex], 
+        boss = Character(hp[bossIndex], xp[bossIndex], gold[bossIndex], maxHp[bossIndex],
             name[bossIndex], image[bossIndex]);
     }
 
@@ -53,6 +56,14 @@ contract Game is ERC721 {
     function getPlayer() public view returns (Character memory) {
         uint256 tokenId = charactersOwnedBy[msg.sender];
         return characters[tokenId];
+    }
+
+    function continuePlayer() public {
+        uint256 tokenId = charactersOwnedBy[msg.sender];
+        Character memory player = characters[tokenId];
+        player.hp = player.maxHp;
+
+        emit PlayerContinued(tokenId);
     }
 
     function getCharacterTypes() public view returns (Character[] memory) {
@@ -84,14 +95,16 @@ contract Game is ERC721 {
         string memory hp = Strings.toString(character.hp);
         string memory xp = Strings.toString(character.xp);
         string memory gold = Strings.toString(character.gold);
+        string memory maxHp = Strings.toString(character.maxHp);
 
         /* solhint-disable quotes */
         string memory name = string(abi.encodePacked('"name":"', character.name, '",'));
         string memory image = string(abi.encodePacked('"image":"', character.image, '",'));
         string memory hpAttribute = string(abi.encodePacked('{ "trait_type": "HP", "value":', hp, '},'));
+        string memory maxHpAttribute = string(abi.encodePacked('{ "trait_type": "Max HP", "value":', maxHp, '},'));
         string memory xpAttribute = string(abi.encodePacked('{ "trait_type": "XP", "value":', xp, '},'));
         string memory goldAttribute = string(abi.encodePacked('{ "trait_type": "Gold", "value":', gold, '}'));
-        string memory attributesFinal = string(abi.encodePacked('"attributes": [', hpAttribute, xpAttribute, goldAttribute, "]"));
+        string memory attributesFinal = string(abi.encodePacked('"attributes": [', hpAttribute, xpAttribute, goldAttribute, maxHpAttribute, "]"));
         /* solhint-enable quotes */
 
         string memory json = string(abi.encodePacked("{", name, image, attributesFinal, "}"));
@@ -134,10 +147,12 @@ contract Game is ERC721 {
 
         console.log("Boss deals %s damage. Player hp: %s\n", playerAttackDamage, player.hp);
 
-        // If the boss is defeated, award xp
+        // If the boss is defeated, award xp, gold
         if (boss.hp == 0) {
             player.xp = player.xp + boss.xp;
-            console.log("Player awarded %s xp, total xp %s", boss.xp, player.xp);
+            player.gold = player.gold + boss.gold;
+            console.log("Player awarded %s xp, total xp %s, gold awarded %s", boss.xp, player.xp, boss.gold);
+            // TODO: Emit boss defeated award
         }
 
         emit AttackComplete(boss.hp, player.hp);

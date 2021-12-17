@@ -2,6 +2,7 @@ const hre = require("hardhat");
 
 async function main() {
   const hp = [3, 1, 1, 5, 100];
+  const maxHp = [3, 1, 1, 5, 100];
   const xp = [4, 2, 2, 4, 100];
   const gold = [5, 2, 4, 20, 100];
   const name = ["Drake", "Slime", "Ghost", "Knight", "Dragon Lord"];
@@ -14,7 +15,7 @@ async function main() {
   ];
 
   const Game = await hre.ethers.getContractFactory("Game");
-  const game = await Game.deploy(hp, xp, gold, name, image);
+  const game = await Game.deploy(hp, xp, gold, maxHp, name, image);
 
   await game.deployed();
 
